@@ -1,14 +1,20 @@
 part of 'timer_bloc.dart';
 
 @immutable
-abstract class TimerEvent extends Equatable {}
+abstract class TimerEvent extends Equatable {
+  @override
+  List<Object> get props => [];
+}
 
-//tell the bloc start counting
+//tell the TimerBloc to start counting
 class TimerStarted extends TimerEvent {
   final int duration;
   TimerStarted({this.duration});
+  // @override
+  // List<Object> get props => [duration];
+
   @override
-  List<Object> get props => [];
+  String toString() => 'TimerStarted(duration: $duration)';
 }
 
 //informs the TimerBloc that the timer should be paused
@@ -35,5 +41,8 @@ class TimerTicked extends TimerEvent {
     @required this.duration,
   });
   @override
-  List<Object> get props => [];
+  List<Object> get props => [duration];
+
+  @override
+  String toString() => 'TimerTicked(duration: $duration)';
 }

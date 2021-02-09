@@ -6,6 +6,9 @@ abstract class TimerState extends Equatable {
   const TimerState({
     this.duration,
   });
+
+  @override
+  List<Object> get props => [duration];
 }
 
 class TimerInitial extends TimerState {
@@ -14,7 +17,10 @@ class TimerInitial extends TimerState {
     this.duration,
   });
   @override
-  List<Object> get props => [];
+  List<Object> get props => [duration];
+
+  @override
+  String toString() => 'TimerInitial(duration: $duration)';
 }
 
 class TimerRunInProgress extends TimerState {
@@ -23,7 +29,10 @@ class TimerRunInProgress extends TimerState {
     this.duration,
   });
   @override
-  List<Object> get props => [];
+  List<Object> get props => [duration];
+
+  @override
+  String toString() => 'TimerRunInProgress(duration: $duration)';
 }
 
 class TimerRunPause extends TimerState {
@@ -32,14 +41,18 @@ class TimerRunPause extends TimerState {
     this.duration,
   });
   @override
-  List<Object> get props => [];
+  List<Object> get props => [duration];
+
+  @override
+  String toString() => 'TimerRunPause(duration: $duration)';
 }
 
 class TimerRunComplete extends TimerState {
-  final int duration;
-  TimerRunComplete({
-    this.duration,
-  });
+  const TimerRunComplete() : super(duration: 0);
+
   @override
-  List<Object> get props => [];
+  List<Object> get props => [duration];
+
+  @override
+  String toString() => 'TimerRunComplete(duration: $duration)';
 }
