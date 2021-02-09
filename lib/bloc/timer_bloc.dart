@@ -83,4 +83,10 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     _tickerSubscription.cancel();
     return super.close();
   }
+
+  @override
+  void onTransition(Transition<TimerEvent, TimerState> transition) {
+    super.onTransition(transition);
+    print(transition.event);
+  }
 }

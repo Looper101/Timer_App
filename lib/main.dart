@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:timer/bloc/timer_bloc.dart';
 import 'package:timer/ticker.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 
 void main() {
   runApp(MyApp());
@@ -79,17 +80,42 @@ class Actions extends StatefulWidget {
 class _ActionsState extends State<Actions> {
   TextEditingController _hourController = TextEditingController();
   TextEditingController _minuteController = TextEditingController();
+  TextEditingController _secondsController = TextEditingController();
+
+  timeFixer({String hour, String minute, String seconds}) {
+    var hr = int.parse(hour.length > 2 ? hour : '0' + hour);
+    var mn = int.parse(minute.length > 2 ? minute : '0' + minute);
+    var sec = int.parse(seconds.length > 2 ? seconds : '0' + seconds);
+
+    var duration = Duration(hours: hr, minutes: mn, seconds: sec);
+
+    print(duration);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        FlatButton(
+          child: Text('Set time'),
+          onPressed: () {},
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildTimeEnter(label: 'Hours', controller: _hourController),
-            _buildTimeEnter(label: 'Minute', controller: _minuteController),
+            _buildTimeEnter(label: 'Hrs', controller: _hourController),
+            _buildTimeEnter(label: 'Min', controller: _minuteController),
+            _buildTimeEnter(label: 'Sec', controller: _secondsController)
           ],
+        ),
+        FlatButton(
+          child: Text('set time'),
+          onPressed: () {
+            timeFixer(
+                hour: _hourController.text,
+                minute: _minuteController.text,
+                seconds: _secondsController.text);
+          },
         ),
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
