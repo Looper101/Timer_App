@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:timer/bloc/timer_bloc.dart';
 import 'package:timer/ticker.dart';
-import 'package:flutter_picker/flutter_picker.dart';
 
 void main() {
   runApp(MyApp());
@@ -49,7 +48,7 @@ class TimerUI extends StatelessWidget {
                     .padLeft(2, '0');
 
                 return Text(
-                  '$minutesStr:$secondsStr',
+                  intToTimeLeft(state.duration),
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -82,14 +81,14 @@ class _ActionsState extends State<Actions> {
   TextEditingController _minuteController = TextEditingController();
   TextEditingController _secondsController = TextEditingController();
 
-  timeFixer({String hour, String minute, String seconds}) {
+  int totalTime({String hour, String minute, String seconds}) {
     var hr = int.parse(hour.length > 2 ? hour : '0' + hour);
     var mn = int.parse(minute.length > 2 ? minute : '0' + minute);
     var sec = int.parse(seconds.length > 2 ? seconds : '0' + seconds);
 
     var duration = Duration(hours: hr, minutes: mn, seconds: sec);
 
-    print(duration);
+    return duration.inSeconds;
   }
 
   @override
@@ -108,20 +107,17 @@ class _ActionsState extends State<Actions> {
             _buildTimeEnter(label: 'Sec', controller: _secondsController)
           ],
         ),
-        FlatButton(
-          child: Text('set time'),
-          onPressed: () {
-            timeFixer(
-                hour: _hourController.text,
-                minute: _minuteController.text,
-                seconds: _secondsController.text);
-          },
-        ),
+        SizedBox(height: 30),
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: _mapStateToActionButton(
+            children: _stateToControl(
                 timerBloc: BlocProvider.of<TimerBloc>(context),
-                context: context)),
+                context: context,
+                durationInInt: totalTime(
+                  hour: _hourController.text,
+                  minute: _minuteController.text,
+                  seconds: _secondsController.text,
+                ))),
       ],
     );
   }
@@ -141,10 +137,12 @@ class _ActionsState extends State<Actions> {
           controller: controller,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
           maxLength: 2,
+          textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
               enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
               disabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
+              focusedBorder: InputBorder.none,
               counterText: '',
               hintText: label,
               hintStyle: TextStyle(fontSize: 20, color: Colors.grey.shade500)),
@@ -153,18 +151,20 @@ class _ActionsState extends State<Actions> {
     );
   }
 
-  List<Widget> _mapStateToActionButton(
-      {TimerBloc timerBloc,
-      BuildContext context,
-      TextEditingController hourController,
-      TextEditingController minuteController}) {
+  List<Widget> _stateToControl(
+      {TimerBloc timerBloc, BuildContext context, int durationInInt}) {
     final TimerState currentState = timerBloc.state;
 
     if (currentState is TimerInitial) {
       return [
         FloatingActionButton(
           child: Icon(Icons.play_arrow_sharp),
-          onPressed: () => timerBloc.add(TimerStarted(duration: 60)),
+          onPressed: () {
+            //clear fields
+            timerBloc.add(TimerStarted(
+              duration: durationInInt.toInt() ?? 0,
+            ));
+          },
         ) //add the timerstarted Event,
       ];
     }
@@ -175,7 +175,7 @@ class _ActionsState extends State<Actions> {
             child: Icon(Icons.pause),
             onPressed: () => timerBloc.add(TimerPaused())),
         FloatingActionButton(
-          child: Icon(Icons.replay),
+          child: Icon(Icons.stop),
           onPressed: () => timerBloc.add(TimerReset()),
         )
       ];
@@ -190,7 +190,7 @@ class _ActionsState extends State<Actions> {
               .add(TimerStarted(duration: currentState.duration)),
         ),
         FloatingActionButton(
-          child: Icon(Icons.replay),
+          child: Icon(Icons.stop),
           onPressed: () =>
               BlocProvider.of<TimerBloc>(context).add(TimerReset()),
         )
@@ -208,4 +208,26 @@ class _ActionsState extends State<Actions> {
 
     return [];
   }
+}
+
+String intToTimeLeft(int value) {
+  int h, m, s;
+
+  h = value ~/ 3600;
+
+  m = ((value - h * 3600)) ~/ 60;
+
+  s = value - (h * 3600) - (m * 60);
+
+  String hourLeft = h.toString().length < 2 ? "0" + h.toString() : h.toString();
+
+  String minuteLeft =
+      m.toString().length < 2 ? "0" + m.toString() : m.toString();
+
+  String secondsLeft =
+      s.toString().length < 2 ? "0" + s.toString() : s.toString();
+
+  String result = "$hourLeft:$minuteLeft:$secondsLeft";
+
+  return result;
 }
