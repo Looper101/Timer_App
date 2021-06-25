@@ -9,9 +9,9 @@ part 'timer_event.dart';
 part 'timer_state.dart';
 
 class TimerBloc extends Bloc<TimerEvent, TimerState> {
-//depend on the ticker class we created to generate stream<int>
+//! Depend on the ticker class we created to generate stream<int>
   final Ticker _ticker;
-  static final int _duration = 60;
+  static final int _duration = 0;
 
   StreamSubscription<int> _tickerSubscription;
 
@@ -41,13 +41,13 @@ class TimerBloc extends Bloc<TimerEvent, TimerState> {
     }
   }
 
-  Stream<TimerState> _mapTimerStartedToState(TimerStarted start) async* {
-    yield TimerRunInProgress(duration: start.duration);
+  Stream<TimerState> _mapTimerStartedToState(TimerStarted event) async* {
+    yield TimerRunInProgress(duration: event.duration);
 
     //if there was an already opened _tickerSubscription ..we need to cancel it
     _tickerSubscription?.cancel(); //Cancel it to allocate memory
     _tickerSubscription = _ticker
-        .tick(tick: start.duration)
+        .tick(tick: event.duration)
         .listen((duration) => add(TimerTicked(duration: duration)));
   }
 
